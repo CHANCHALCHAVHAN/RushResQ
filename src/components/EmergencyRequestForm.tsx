@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Phone, Car, Truck, AlertTriangle, CheckCircle, Clock, Siren } from 'lucide-react';
+import { MapPin, Phone, AlertTriangle, CheckCircle, Clock, Siren } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const requestSchema = z.object({
@@ -25,7 +25,7 @@ type RequestForm = z.infer<typeof requestSchema>;
 
 const EmergencyRequestForm = () => {
   const { toast } = useToast();
-  const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'tracking'>('idle');
 
@@ -55,10 +55,10 @@ const EmergencyRequestForm = () => {
             description: "GPS coordinates have been added to your request.",
           });
         },
-        (error) => {
+        () => {
           toast({
             title: "Location error",
-            description: "Unable to get your location. Please ensure location services are enabled.",
+            description: "Unable to get your location. Please enable location services.",
             variant: "destructive",
           });
         }
@@ -77,21 +77,47 @@ const EmergencyRequestForm = () => {
     }
 
     setStatus('submitting');
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const newRequestId = `REQ${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-    setRequestId(newRequestId);
-    setStatus('success');
-    
-    toast({
-      title: "Emergency request submitted!",
-      description: `Request ID: ${newRequestId}. Traffic corridor is being processed.`,
-    });
 
-    // Start status tracking simulation
-    setTimeout(() => setStatus('tracking'), 3000);
+    const payload = {
+      ...data,
+      latitude: location.lat,
+      longitude: location.lng,
+    };
+
+    try {
+      // ✅ Replace with your Google Apps Script Web App URL
+      const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwVx64Gu58b7Frv1DqCel3teidOF4bJ3g88pDGSYJzGKnbKQTT6i3DVUyXz7GeI62XkwA/exec";
+
+      const response = await fetch(GOOGLE_SHEET_WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        const newRequestId = `REQ${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+        setRequestId(newRequestId);
+        setStatus('success');
+        toast({
+          title: "Emergency request submitted!",
+          description: `Request ID: ${newRequestId}. Traffic corridor is being processed.`,
+        });
+
+        setTimeout(() => setStatus('tracking'), 3000);
+      } else {
+        throw new Error('Failed to save request');
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Submission failed",
+        description: "Unable to save request. Please try again later.",
+        variant: "destructive",
+      });
+      setStatus('idle');
+    }
   };
 
   const StatusTimeline = () => {
@@ -167,66 +193,39 @@ const EmergencyRequestForm = () => {
               )}
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* Caller Name */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="callerName">Caller Name *</Label>
-                    <Input
-                      id="callerName"
-                      {...register('callerName')}
-                      className="mt-1"
-                      placeholder="Enter your full name"
-                    />
-                    {errors.callerName && (
-                      <p className="text-sm text-emergency mt-1">{errors.callerName.message}</p>
-                    )}
+                    <Input id="callerName" {...register('callerName')} className="mt-1" placeholder="Enter your full name" />
+                    {errors.callerName && <p className="text-sm text-emergency mt-1">{errors.callerName.message}</p>}
                   </div>
 
                   <div>
                     <Label htmlFor="phoneNumber">Phone Number *</Label>
-                    <Input
-                      id="phoneNumber"
-                      {...register('phoneNumber')}
-                      className="mt-1"
-                      placeholder="+1 234 567 8900"
-                    />
-                    {errors.phoneNumber && (
-                      <p className="text-sm text-emergency mt-1">{errors.phoneNumber.message}</p>
-                    )}
+                    <Input id="phoneNumber" {...register('phoneNumber')} className="mt-1" placeholder="+1 234 567 8900" />
+                    {errors.phoneNumber && <p className="text-sm text-emergency mt-1">{errors.phoneNumber.message}</p>}
                   </div>
                 </div>
 
+                {/* Route and Vehicle ID */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="routeNumber">Route Number *</Label>
-                    <Input
-                      id="routeNumber"
-                      {...register('routeNumber')}
-                      className="mt-1"
-                      placeholder="e.g., Route 66, I-95, Main St"
-                    />
-                    {errors.routeNumber && (
-                      <p className="text-sm text-emergency mt-1">{errors.routeNumber.message}</p>
-                    )}
+                    <Input id="routeNumber" {...register('routeNumber')} className="mt-1" placeholder="e.g., Route 66, I-95, Main St" />
+                    {errors.routeNumber && <p className="text-sm text-emergency mt-1">{errors.routeNumber.message}</p>}
                   </div>
 
                   <div>
                     <Label htmlFor="vehicleId">Vehicle ID (Optional)</Label>
-                    <Input
-                      id="vehicleId"
-                      {...register('vehicleId')}
-                      className="mt-1"
-                      placeholder="Vehicle identification"
-                    />
+                    <Input id="vehicleId" {...register('vehicleId')} className="mt-1" placeholder="Vehicle identification" />
                   </div>
                 </div>
 
+                {/* Vehicle Type */}
                 <div>
                   <Label>Vehicle Emergency Type *</Label>
-                  <RadioGroup
-                    value={vehicleType}
-                    onValueChange={(value) => setValue('vehicleType', value as any)}
-                    className="mt-2"
-                  >
+                  <RadioGroup value={vehicleType} onValueChange={(value) => setValue('vehicleType', value as 'ambulance' | 'fire' | 'police' | 'emergency')} className="mt-2">
                     <div className="grid grid-cols-2 gap-4">
                       {vehicleTypes.map((type) => (
                         <div key={type.id} className="flex items-center space-x-2">
@@ -239,70 +238,45 @@ const EmergencyRequestForm = () => {
                       ))}
                     </div>
                   </RadioGroup>
-                  {errors.vehicleType && (
-                    <p className="text-sm text-emergency mt-1">{errors.vehicleType.message}</p>
-                  )}
+                  {errors.vehicleType && <p className="text-sm text-emergency mt-1">{errors.vehicleType.message}</p>}
                 </div>
 
+                {/* Location */}
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <Label className="text-sm font-medium">GPS Location</Label>
                     {location ? (
-                      <Badge variant="outline" className="status-active">
-                        <MapPin className="w-3 h-3 mr-1" />
-                        Captured
-                      </Badge>
+                      <Badge variant="outline" className="status-active"><MapPin className="w-3 h-3 mr-1" />Captured</Badge>
                     ) : (
-                      <Badge variant="outline" className="status-warning">
-                        Required
-                      </Badge>
+                      <Badge variant="outline" className="status-warning">Required</Badge>
                     )}
                   </div>
-                  
                   {location ? (
-                    <p className="text-sm text-muted-foreground">
-                      Lat: {location.lat.toFixed(6)}, Lng: {location.lng.toFixed(6)}
-                    </p>
+                    <p className="text-sm text-muted-foreground">Lat: {location.lat.toFixed(6)}, Lng: {location.lng.toFixed(6)}</p>
                   ) : (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={getLocation}
-                      className="w-full"
-                    >
-                      <MapPin className="w-4 h-4 mr-2" />
-                      Use My Location
+                    <Button type="button" variant="outline" onClick={getLocation} className="w-full">
+                      <MapPin className="w-4 h-4 mr-2" /> Use My Location
                     </Button>
                   )}
                 </div>
 
+                {/* Consent */}
                 <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="consent"
-                    onCheckedChange={(checked) => setValue('consent', checked as boolean)}
-                  />
+                  <Checkbox id="consent" onCheckedChange={(checked) => setValue('consent', checked as boolean)} />
                   <Label htmlFor="consent" className="text-sm">
                     I confirm this is a real emergency and authorize traffic signal adjustments
                   </Label>
                 </div>
-                {errors.consent && (
-                  <p className="text-sm text-emergency">{errors.consent.message}</p>
-                )}
+                {errors.consent && <p className="text-sm text-emergency">{errors.consent.message}</p>}
 
-                <Button
-                  type="submit"
-                  className="btn-emergency w-full text-lg py-6"
-                  disabled={status === 'submitting'}
-                >
+                <Button type="submit" className="btn-emergency w-full text-lg py-6" disabled={status === 'submitting'}>
                   {status === 'submitting' ? (
                     <>
-                      <Clock className="w-5 h-5 mr-2 animate-spin" />
-                      Processing Request...
+                      <Clock className="w-5 h-5 mr-2 animate-spin" /> Processing Request...
                     </>
                   ) : (
                     <>
-                      <Phone className="w-5 h-5 mr-2" />
-                      Submit Emergency Request
+                      <Phone className="w-5 h-5 mr-2" /> Submit Emergency Request
                     </>
                   )}
                 </Button>
