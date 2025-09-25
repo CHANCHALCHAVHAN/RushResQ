@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+ <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RushResQ - Smart AI & IOT Traffic Management System</title>
@@ -37,20 +37,83 @@
     <meta
       name="twitter:image"
       content="https://lovable.dev/opengraph-image-p98pqg.png"
-    />
-  </head>
-
+    />
+  </head>
   <body>
+    <!-- Main App Root -->
+     <DIV></DIV>
     <div id="root"></div>
+
+    <!-- Vapi Assistant Widget Container -->
+    <div id="vapi-chatbot"
+         style="position: fixed; bottom: 20px; right: 20px; width: 350px; height: 500px; z-index: 9999;">
+    </div>
+
+    <!-- If you have a React/TS app, this loads it -->
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- 👇 Vapi Assistant Widget Integration -->
-    <script src="https://cdn.vapi.ai/widget.js"></script>
+    <!-- 👇 Vapi + Google Sheets Integration -->
     <script>
-      VapiWidget.init({
-        assistantId: "387deb3e-5591-425b-a815-34fcf1fb5752",  // replace with your real assistant ID
-        apiKey: "6d92c2b5-0061-423a-9097-6ba5963cdec9"          // replace with your public API key
-      });
+      const assistantId = "387deb3e-5591-425b-a815-34fcf1fb5752"; // 🔹 Replace with your Vapi Assistant ID
+      const apiKey = "6d92c2b5-0061-423a-9097-6ba5963cdec9";       // 🔹 Replace with your Public API Key
+
+      const buttonConfig = {
+        container: "#vapi-chatbot", // Widget will render in this div
+      };
+
+      // ✅ Function: Send messages to Google Sheet
+      function sendToGoogleSheet(message) {
+        fetch("https://script.google.com/macros/s/AKfycbxKwW3EgWMR7lJ4T8Zh7KLR0g2iuTspnYvNlxQ5Mdy9uDZ5wsxNNuABG8V0bOV-QNNZYw/exec", { // 🔹 Replace with your Apps Script Web App URL
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: message,
+            timestamp: new Date().toISOString()
+          }),
+        })
+        .then((res) => res.json())
+        .then((data) => console.log("Saved to Google Sheet:", data))
+        .catch((err) => console.error("Error saving message:", err));
+      }
+
+      // ✅ Load Vapi SDK
+      (function (d, t) {
+        var g = document.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        g.src =
+          "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+        g.defer = true;
+        g.async = true;
+        s.parentNode.insertBefore(g, s);
+
+        g.onload = function () {
+          // Initialize floating widget
+          if (window.VapiWidget) {
+            VapiWidget.init({
+              assistantId: assistantId,
+              apiKey: apiKey
+            });
+          }
+
+          // Initialize custom container
+          if (window.vapiSDK) {
+            window.vapiInstance = window.vapiSDK.run({
+              apiKey: apiKey,
+              assistant: assistantId,
+              config: buttonConfig,
+            });
+
+            // Capture user speech-to-text messages
+            window.vapiInstance.on("user_message", (event) => {
+              const userMessage = event.text;
+              console.log("User said:", userMessage);
+              sendToGoogleSheet(userMessage); // 👈 Save to Google Sheets
+            });
+          }
+        };
+      })(document, "script");
     </script>
   </body>
 </html>
