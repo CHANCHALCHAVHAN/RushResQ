@@ -2,41 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* RushResQ Design System - Emergency Traffic Corridor Theme */
 
 @layer base {
   :root {
+    /* Base colors */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 210 20% 20%;
 
+    /* Card system */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 210 20% 20%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Emergency color palette */
+    --primary: 142 76% 36%; /* Emerald Green #2ecc71 */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 142 76% 56%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --emergency: 348 84% 58%; /* Crimson Red #e74c3c */
+    --emergency-foreground: 0 0% 100%;
+    --emergency-glow: 348 84% 68%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --warning: 48 89% 60%; /* Amber Yellow #f1c40f */
+    --warning-foreground: 210 20% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --neutral-dark: 210 20% 20%; /* Dark Gray #2c3e50 */
+    --neutral-light: 210 20% 95%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* System colors */
+    --secondary: 210 20% 95%;
+    --secondary-foreground: 210 20% 20%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --muted: 210 20% 97%;
+    --muted-foreground: 210 10% 50%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --accent: 142 76% 96%;
+    --accent-foreground: 142 76% 36%;
 
-    --radius: 0.5rem;
+    --destructive: 348 84% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 20% 90%;
+    --input: 210 20% 97%;
+    --ring: 142 76% 36%;
+
+    /* Design tokens */
+    --radius: 0.75rem;
+
+    /* Emergency gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-emergency: linear-gradient(135deg, hsl(var(--emergency)), hsl(var(--emergency-glow)));
+    --gradient-dark: linear-gradient(135deg, hsl(var(--neutral-dark)), hsl(210 20% 30%));
+    
+    /* Shadows */
+    --shadow-card: 0 4px 20px -2px hsl(var(--primary) / 0.1);
+    --shadow-emergency: 0 8px 30px -4px hsl(var(--emergency) / 0.3);
+    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.4);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +125,57 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  /* Custom button variants */
+  .btn-hero {
+    @apply bg-primary text-primary-foreground hover:bg-primary-glow shadow-lg hover:shadow-glow transition-all duration-300 hover:scale-105;
+  }
+  
+  .btn-emergency {
+    @apply bg-emergency text-emergency-foreground hover:bg-emergency-glow shadow-emergency transition-all duration-300 hover:scale-105;
+  }
+  
+  .btn-outline-hero {
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300;
+  }
+
+  /* Card effects */
+  .card-emergency {
+    @apply bg-card border border-primary/20 shadow-card hover:shadow-glow transition-all duration-300;
+  }
+  
+  .card-glow {
+    @apply shadow-glow;
+  }
+
+  /* Navigation effects */
+  .nav-link {
+    @apply relative hover:text-primary transition-all duration-300 after:content-[''] after:absolute after:w-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full;
+  }
+
+  /* Status indicators */
+  .status-active {
+    @apply bg-primary text-primary-foreground;
+  }
+  
+  .status-warning {
+    @apply bg-warning text-warning-foreground;
+  }
+  
+  .status-emergency {
+    @apply bg-emergency text-emergency-foreground;
+  }
+
+  /* Animations */
+  .fade-in {
+    @apply animate-fade-in;
+  }
+  
+  .bounce-in {
+    @apply animate-bounce-in;
   }
 }
