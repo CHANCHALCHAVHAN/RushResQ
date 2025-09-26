@@ -37,17 +37,27 @@
     <meta
       name="twitter:image"
       content="https://lovable.dev/opengraph-image-p98pqg.png"
-    />
-  </head>
+    />
+
+    <!-- 👇 Added CSS to move widget up -->
+    <style>
+      #vapi-chatbot {
+        position: fixed;
+        bottom: 80px !important; /* ~2–3 cm above screen bottom */
+        right: 20px !important;
+        width: 350px;
+        height: 500px;
+        z-index: 9999;
+      }
+    </style>
+  </head>
   <body>
     <!-- Main App Root -->
      <DIV></DIV>
     <div id="root"></div>
 
     <!-- Vapi Assistant Widget Container -->
-    <div id="vapi-chatbot"
-         style="position: fixed; bottom: 20px; right: 20px; width: 350px; height: 500px; z-index: 9999;">
-    </div>
+    <div id="vapi-chatbot"></div>
 
     <!-- If you have a React/TS app, this loads it -->
     <script type="module" src="/src/main.tsx"></script>
