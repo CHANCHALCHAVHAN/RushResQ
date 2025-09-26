@@ -51,21 +51,21 @@ const ContactSection = () => {
     {
       icon: Mail,
       label: 'Email',
-      value: 'contact@rushresque.com',
-      href: 'mailto:contact@rushresque.com',
+      value: 'rushresq@gmail.com',
+      href: 'mailto:sakuchavhan08@gmail.com',
       color: 'text-blue-500',
     },
     {
       icon: Phone,
       label: 'Phone',
-      value: '+1 (555) 123-4567',
-      href: 'tel:+15551234567',
+      value: '+91 8087871131',
+      href: 'tel:+918087871131',
       color: 'text-green-500',
     },
     {
       icon: MapPin,
       label: 'Location',
-      value: 'San Francisco, CA',
+      value: 'Kopargaon, Maharashtra, India',
       href: 'https://maps.google.com',
       color: 'text-red-500',
     },
@@ -75,13 +75,13 @@ const ContactSection = () => {
     {
       icon: Github,
       label: 'GitHub',
-      href: 'https://github.com/team-innovions',
+      href: 'https://github.com/CHANCHALCHAVHAN/RushResQ/blob/main/index.html',
       color: 'text-gray-700',
     },
     {
       icon: Linkedin,
       label: 'LinkedIn',
-      href: 'https://linkedin.com/company/team-innovions',
+      href: 'https://www.linkedin.com/in/rushresq-smart-traffic-system-184136387/',
       color: 'text-blue-600',
     },
   ];
@@ -152,7 +152,7 @@ const ContactSection = () => {
                           id="message"
                           {...register('message')}
                           className="mt-1 bg-white/10 border-white/20 text-white placeholder:text-gray-400 min-h-[120px]"
-                          placeholder="Tell us about your project or question..."
+                          placeholder="Tell us about your Question..."
                         />
                         {errors.message && (
                           <p className="text-sm text-emergency mt-1">{errors.message.message}</p>
@@ -234,11 +234,11 @@ const ContactSection = () => {
                   For critical system issues or emergency corridor failures, contact our 24/7 support team:
                 </p>
                 <a 
-                  href="tel:+1555911911"
+                  href="tel:+91 8087871131"
                   className="btn-emergency inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium"
                 >
                   <Phone className="w-4 h-4 mr-2" />
-                  Emergency: +1 (555) 911-911
+                  Emergency: +91 8087871131
                 </a>
               </div>
             </div>
