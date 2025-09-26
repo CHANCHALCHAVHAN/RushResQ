@@ -5,34 +5,34 @@ import teamPhoto from '@/assets/team-photo.jpg';
 const AboutSection = () => {
   const teamMembers = [
     {
-      name: 'Dr. Sarah Chen',
-      role: 'AI Research Lead',
+      name: 'Chanchal Karna Chavhan',
+      role: 'Frontend & AI Research Lead',
       avatar: '👩‍💻',
-      bio: 'PhD in Machine Learning, specializing in real-time traffic optimization algorithms.',
+      bio: 'Electronics & Computer Engineer specializing in AI for emergency response systems.',
     },
     {
-      name: 'Marcus Rodriguez',
-      role: 'IoT Systems Engineer',
+      name: 'Shraddha Sunil Chavhan',
+      role: 'AI & Backend Developer',
       avatar: '👨‍🔧',
-      bio: 'Expert in smart city infrastructure and emergency response sensor networks.',
+      bio: 'Electronics & Computer Engineer specializing in AI and backend solutions for smart cities.',
     },
     {
-      name: 'Priya Patel',
-      role: 'Full-Stack Developer',
+      name: 'Sanika More',
+      role: 'vapi Chatbot Developer',
       avatar: '👩‍💼',
-      bio: 'Builds scalable web applications and emergency response dashboards.',
+      bio: 'Electronics & Computer Engineer specializing in AI-driven chatbot solutions.',
     },
     {
-      name: 'James Kim',
-      role: 'Data Scientist',
+      name: 'Kunal Sharad Gawand',
+      role: 'Vapi Chatbot co-Developer',
       avatar: '👨‍🎓',
-      bio: 'Analytics expert focusing on traffic patterns and emergency response metrics.',
+      bio: 'Computer Science Engineer focusing on AI and chatbot technologies.',
     },
     {
-      name: 'Elena Vasquez',
-      role: 'UX/UI Designer',
+      name: 'Swarup Sachin Sandhan',
+      role: 'IoT Systems Developer',
       avatar: '👩‍🎨',
-      bio: 'Creates intuitive interfaces for emergency responders and traffic operators.',
+      bio: 'Electronics & Computer Engineer with a passion for IoT and smart city innovations.',
     },
   ];
 
@@ -56,7 +56,7 @@ const AboutSection = () => {
               <div className="mb-12">
                 <img 
                   src={teamPhoto} 
-                  alt="Team Innovions - AI Emergency Response Specialists"
+                  alt="Team INNOVIONS - AI Emergency Response Specialists"
                   className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg"
                 />
               </div>
