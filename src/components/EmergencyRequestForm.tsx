@@ -1,9 +1,8 @@
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { saveAs } from 'file-saver';
-import * as XLSX from 'xlsx';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -59,49 +58,67 @@ const EmergencyRequestForm = () => {
     }
   };
 
-  const saveToExcel = (data: RequestForm) => {
-    const wsData = [[
-      "Timestamp", "Caller Name", "Phone Number", "Route Number", "Vehicle Type", "Vehicle ID", "Latitude", "Longitude", "Consent"
-    ]];
+  const SHEETDB_URL = "https://sheetdb.io/api/v1/h6hsy831jb8wp";
 
-    wsData.push([
-      new Date().toLocaleString(),
-      data.callerName,
-      data.phoneNumber,
-      data.routeNumber,
-      data.vehicleType,
-      data.vehicleId || '',
-      location?.lat !== undefined ? String(location.lat) : '',
-      location?.lng !== undefined ? String(location.lng) : '',
-      data.consent ? 'Yes' : 'No',
-    ]);
+  // Convert boolean consent to Yes/No string
+  const boolToYesNo = (b?: boolean) => (b ? "Yes" : "No");
 
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'EmergencyRequests');
-
-    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([buf], { type: 'application/octet-stream' });
-    saveAs(blob, 'EmergencyRequests.xlsx');
+  // Prepare payload for SheetDB
+  const buildSheetRow = (data: RequestForm, requestId: string | null) => {
+    return {
+      "Timestamp": new Date().toLocaleString(),
+      "Request ID": requestId ?? "",
+      "Caller Name": data.callerName,
+      "Phone Number": data.phoneNumber,
+      "Route Number": data.routeNumber,
+      "Vehicle Type": data.vehicleType,
+      "Vehicle ID": data.vehicleId || "",
+      "Latitude": location?.lat ?? "",
+      "Longitude": location?.lng ?? "",
+      "Consent": boolToYesNo(data.consent),
+      "Form Status": status,
+    };
   };
 
-  const onSubmit = (data: RequestForm) => {
+  // Send row to SheetDB
+  const sendToSheetDB = async (rowObj: Record<string, any>) => {
+    const payload = { data: [ rowObj ] };
+    const res = await fetch(SHEETDB_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`SheetDB error: ${res.status} ${res.statusText} ${text}`);
+    }
+    return res.json();
+  };
+
+  const onSubmit = async (data: RequestForm) => {
     if (!location) {
       toast({ title: "Location required", description: "Please capture GPS location.", variant: "destructive" });
       return;
     }
+
     setStatus('submitting');
 
     try {
-      saveToExcel(data);
+      // Generate request ID
       const newRequestId = `REQ${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
       setRequestId(newRequestId);
+
+      // Build row & send to SheetDB
+      const row = buildSheetRow(data, newRequestId);
+      await sendToSheetDB(row);
+
       setStatus('success');
       toast({ title: "Request saved!", description: `Request ID: ${newRequestId}` });
+
       setTimeout(() => setStatus('tracking'), 3000);
     } catch (err) {
-      console.error(err);
-      toast({ title: "Failed", description: "Could not save request.", variant: "destructive" });
+      console.error("Failed to save to sheet:", err);
+      toast({ title: "Failed", description: "Could not save request to sheet.", variant: "destructive" });
       setStatus('idle');
     }
   };
